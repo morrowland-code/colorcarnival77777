@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="strawberry">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>✋ Pressure Guide | Color Carnival</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js" defer></script>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(45deg, #ffc8dd, #bde0fe, #caffbf, #ffd6a5);
+      background-size: 400% 400%;
+      animation: bgShift 25s ease infinite;
+      overflow-x: hidden;
+    }
+
+    @keyframes bgShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Floating carnival bubbles */
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      animation: float 10s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      from { transform: translateY(100vh) scale(1); opacity: 0; }
+      50% { opacity: 1; }
+      to { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+    }
+
+    #alertBox {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      border-radius: 10px;
+      color: white;
+      display: none;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+    }
+
+    .success { background: #ff69b4; }
+    .error { background: #ff4d6d; }
+
+    .progress-wrap {
+      background: rgba(255,255,255,0.8);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(255,150,200,0.3);
+      margin-top: 20px;
+    }
+
+    .progress-bar {
+      height: 15px;
+      width: 100%;
+      border-radius: 8px;
+      background: #ffe4ec;
+      overflow: hidden;
+    }
+
+    .progress-bar-inner {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff85a2, #ff4fa1, #ff99c8);
+      border-radius: 8px;
+      transition: width 1s ease;
+    }
+
+    input[type=text] {
+      padding: 5px 10px;
+      border-radius: 8px;
+      border: 1px solid #ffb6c1;
+      outline: none;
+    }
+
+    button {
+      border: none;
+      padding: 10px 15px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #ff85a2, #ff4fa1);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    button:hover { transform: scale(1.05); }
+
+  </style>
+</head>
+<body>
+  <!-- Floating bubbles -->
+  <div id="bubbles"></div>
+  <div id="alertBox"></div>
+
+  <nav class="topnav">
+    <a href="/">🏠 Home</a>
+    <a href="/palette">🍭 Palette</a>
+    <a href="/grid">🍓 Grid</a>
+    <a href="/pressure" class="active">🧁 Pressure</a>
+    <a href="/tutorial">🌈 Tutorial</a>
+    <div class="topnav-right">
+      <select id="themeSelect">
+        <option value="strawberry">Strawberry</option>
+        <option value="lavender">Lavender</option>
+        <option value="peach">Peach</option>
+        <option value="goth">Goth Clown</option>
+      </select>
+    </div>
+  </nav>
+
+  <main class="card">
+    <h1>✋ Pressure & Saturation Guide</h1>
+    <p>Compare your pencil shade with the target to see how hard to press.</p>
+
+    <div class="input-row">
+      <div>
+        <label>🎯 Target color (hex)</label>
+        <input type="text" id="targetHex" placeholder="#ff9bb5" value="#ff9bb5">
+      </div>
+      <div>
+        <label>✏️ Your pencil result (hex)</label>
+        <input type="text" id="actualHex" placeholder="#f17394" value="#f17394">
+      </div>
+    </div>
+
+    <button id="computePressure">Compute pressure</button>
+
+    <div class="progress-wrap">
+      <p>🌈 Saturation difference: <span id="satDiff">0%</span></p>
+      <p>💪 Recommended pressure: <span id="pressureVal">0%</span></p>
+      <div class="progress-bar">
+        <div class="progress-bar-inner" id="pressureBarInner"></div>
+      </div>
+    </div>
+
+    <p style="font-size:13px;margin-top:12px;">
+      💡 Higher pressure = press slightly harder. <br>
+      Lower pressure = lighter touch and layering.
+    </p>
+  </main>
+
+  <script>
+    // 🎈 Floating bubbles animation
+    const bubbles = document.getElementById("bubbles");
+    for (let i = 0; i < 20; i++) {
+      const b = document.createElement("div");
+      b.className = "bubble";
+      b.style.left = Math.random() * 100 + "vw";
+      b.style.width = b.style.height = Math.random() * 20 + 10 + "px";
+      b.style.animationDuration = 8 + Math.random() * 10 + "s";
+      bubbles.appendChild(b);
+    }
+
+    // 🎉 Alert display
+    const alertBox = document.getElementById("alertBox");
+    function showAlert(msg, success=true){
+      alertBox.textContent = msg;
+      alertBox.className = success ? "success" : "error";
+      alertBox.style.display = "block";
+      setTimeout(()=>alertBox.style.display="none", 2500);
+    }
+
+    document.getElementById("computePressure").addEventListener("click", async ()=>{
+      const targetHex = document.getElementById("targetHex").value.trim();
+      const actualHex = document.getElementById("actualHex").value.trim();
+      if(!targetHex || !actualHex){
+        showAlert("Enter both colors first!", false);
+        return;
+      }
+
+      try{
+        const res = await fetch("/api/pressure", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({
+            target: hexToRgb(targetHex),
+            actual: hexToRgb(actualHex)
+          })
+        });
+        const data = await res.json();
+        if(!res.ok){ showAlert(data.error || "Error computing pressure", false); return; }
+
+        const diff = data.saturation_difference || 0;
+        const press = data.pressure_value || 0;
+        document.getElementById("satDiff").textContent = diff.toFixed(1) + "%";
+        document.getElementById("pressureVal").textContent = press.toFixed(1) + "%";
+        document.getElementById("pressureBarInner").style.width = press + "%";
+        showAlert("✅ Computed successfully!", true);
+      }catch{
+        showAlert("Network error 💔", false);
+      }
+    });
+
+    function hexToRgb(h){
+      const c = h.replace("#","").match(/.{1,2}/g);
+      return {r:parseInt(c[0],16), g:parseInt(c[1],16), b:parseInt(c[2],16)};
+    }
+  </script>
+  <img id="strawbebby" src="/static/strawbebby.png" alt="Strawbebby" onclick="randomBebbyTip()">
+  <img id="strawbebby" src="/static/strawbebby.png" alt="Strawbebby" onclick="randomBebbyTip()">
+<script src="/static/strawbebby.js"></script>
+</body>
+</html>

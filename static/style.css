@@ -1,0 +1,501 @@
+/* =============== GLOBAL RESET & BASE =============== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  min-height: 100vh;
+}
+
+/* Layout */
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  color: #222;
+}
+
+/* Card container for each page */
+main.card {
+  max-width: 960px;
+  width: 100%;
+  margin: 80px auto 40px;
+  background: rgba(255, 128, 185, 0.88);
+  border-radius: 24px;
+  padding: 24px 20px 32px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);
+  position: relative;
+  z-index: 1;
+}
+
+/* Small screens */
+@media (max-width: 768px) {
+  main.card {
+    margin: 80px 12px 30px;
+    padding: 18px 14px 24px;
+  }
+}
+
+/* =============== NAVBAR =============== */
+.topnav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  z-index: 100;
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.topnav a {
+  margin-right: 12px;
+  padding: 6px 12px;
+  text-decoration: none;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  background: rgba(255, 255, 255, 0.5);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s;
+}
+
+.topnav a:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  background: rgba(255,255,255,0.9);
+}
+
+.topnav a.active {
+  background: linear-gradient(135deg,#ff69b4, #ff21ad);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(255, 120, 170, 0.5);
+}
+
+.topnav-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#themeSelect,
+#loginStatusButton {
+  border-radius: 999px;
+  border: none;
+  padding: 6px 10px;
+  font-size: 13px;
+  background: rgba(255, 121, 188, 0.9);
+  cursor: pointer;
+}
+
+#loginStatusButton {
+  font-weight: 600;
+}
+
+/* =============== HEADINGS & TEXT =============== */
+h1, h2, h3 {
+  margin: 0 0 10px;
+}
+
+p {
+  margin: 0 0 8px;
+}
+
+/* =============== BUTTONS =============== */
+button,
+.btn-primary {
+  border-radius: 999px;
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #ff7bb0, #ffb6e1);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 5px 14px rgba(255, 120, 170, 0.55);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+button:hover,
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(255, 120, 170, 0.7);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+  box-shadow: none;
+}
+
+/* secondary / ghost buttons */
+.btn-ghost {
+  background: rgba(255,255,255,0.85);
+  color: #444;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+}
+
+/* =============== INPUTS =============== */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="color"],
+textarea,
+select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.12);
+  margin: 4px 0 10px;
+  font-size: 14px;
+}
+
+input[type="file"] {
+  margin: 10px 0;
+}
+
+/* small horizontal groups */
+.input-row {
+  display: flex;
+  gap: 10px;
+}
+
+.input-row > * {
+  flex: 1;
+}
+
+/* =============== BACKGROUND BUBBLES =============== */
+.bg-bubbles {
+  position: fixed;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bg-bubbles div {
+  position: absolute;
+  bottom: -160px;
+  width: 40px;
+  height: 40px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 50%;
+  animation: rise 18s infinite ease-in;
+  opacity: 0.6;
+}
+
+.bg-bubbles div:nth-child(1) { left: 10%; animation-delay: 0s; }
+.bg-bubbles div:nth-child(2) { left: 30%; animation-delay: 2s; width: 60px; height: 60px; }
+.bg-bubbles div:nth-child(3) { left: 50%; animation-delay: 4s; }
+.bg-bubbles div:nth-child(4) { left: 70%; animation-delay: 1s; width: 50px; height: 50px; }
+.bg-bubbles div:nth-child(5) { left: 90%; animation-delay: 3s; }
+
+@keyframes rise {
+  0% { transform: translateY(0) scale(1); opacity: 0.5; }
+  50% { opacity: 0.9; }
+  100% { transform: translateY(-120vh) scale(1.2); opacity: 0; }
+}
+
+/* =============== CONFETTI CANVAS & ALERT BOX =============== */
+#confettiCanvas {
+  position: fixed;
+  pointer-events: none;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 50;
+}
+
+#alertBox {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 220px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  font-size: 14px;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 80;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+#alertBox.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(4px);
+}
+
+/* success / error coloring */
+#alertBox.success {
+  border: 2px solid #4caf50;
+}
+
+#alertBox.error {
+  border: 2px solid #f44336;
+}
+
+/* =============== STRAWBEBBY CHARACTER =============== */
+#strawbebby {
+  position: fixed;
+  bottom: 14px;
+  right: 14px;
+  width: 90px;
+  height: auto;
+  z-index: 101;
+  cursor: pointer;
+  filter: drop-shadow(0 6px 16px rgba(0,0,0,0.4));
+  transition: transform 0.2s ease;
+}
+
+#strawbebby:hover {
+  transform: translateY(-3px) rotate(-2deg);
+}
+
+/* wiggle animation when triggered */
+.bebby-wiggle {
+  animation: bebbyWiggle 0.6s ease-in-out;
+}
+
+@keyframes bebbyWiggle {
+  0% { transform: translateY(-3px) rotate(0deg); }
+  25% { transform: translateY(-4px) rotate(-4deg); }
+  50% { transform: translateY(-3px) rotate(4deg); }
+  75% { transform: translateY(-2px) rotate(-2deg); }
+  100% { transform: translateY(-3px) rotate(0deg); }
+}
+
+/* =============== INDEX: AUTH PANELS =============== */
+.auth-panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.auth-panel {
+  border-radius: 18px;
+  padding: 16px;
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* progress bars for pressure page */
+.progress-wrap {
+  margin-top: 12px;
+}
+.progress-bar {
+  position: relative;
+  width: 100%;
+  height: 16px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+.progress-bar-inner {
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%;
+  width: 0%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ff7bb0, #ffb6e1);
+  transition: width 0.5s ease;
+}
+
+/* scrollable result container for grids */
+.grid-results {
+  max-height: 400px;
+  overflow-y: auto;
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,0.08);
+  padding: 10px;
+  margin-top: 14px;
+  background: rgba(255,255,255,0.8);
+}
+
+.grid-cell-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-bottom: 1px dashed rgba(0,0,0,0.06);
+  font-size: 13px;
+}
+.grid-cell-row:last-child {
+  border-bottom: none;
+}
+.grid-swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.15);
+}
+
+/* tag chips */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: rgba(0,0,0,0.06);
+}
+
+/* =============== THEMES (MOVING BACKGROUNDS) =============== */
+
+/* Strawberry theme: pink carnival */
+html[data-theme="strawberry"] body {
+  background: linear-gradient(120deg,#ffa760, #ff84bb, #75ff95, #ff7caa, #db93ff, #fe73d2, #de5bff, #ff5f97 );
+  background-size: 300% 300%;
+  animation: bgStrawberry 10s ease-in-out infinite alternate;
+}
+@keyframes bgStrawberry {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+/* Lavender theme: dreamy purple skies */
+html[data-theme="lavender"] body {
+  background: radial-gradient(circle at 10% 0%, #ede7ff, #c3b6ff, #f4edff);
+  background-size: 250% 250%;
+  animation: bgLavender 12s ease-in-out infinite alternate;
+}
+@keyframes bgLavender {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+/* Peach theme: warm sunset carnival */
+html[data-theme="carnival"] body {
+  background: linear-gradient(135deg, hsl(0, 100%, 65%), #ff4c67, #ff8640,#ffdd76,#93ff58,#28ffb7,#8a9bff,#d050ff,#ff4e80);
+  background-size: 280% 280%;
+  animation: bgPeach 11s ease-in-out infinite alternate;
+}
+@keyframes bgPeach {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+/* Goth clown theme: dark but neon cute */
+html[data-theme="goth"] body {
+  background: radial-gradient(circle at 20% 20%, #ff82e6, #3b1b4a, #05000b);
+  background-size: 260% 260%;
+  animation: bgGoth 14s ease-in-out infinite alternate;
+  color: #f8f0ff;
+}
+html[data-theme="goth"] main.card {
+  background: rgba(14, 3, 24, 0.88);
+  color: #fef7ff;
+}
+@keyframes bgGoth {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+/* 🌈 Rainbow Carnival Theme */
+html[data-theme="rainbow"] body {
+  background: linear-gradient(
+    270deg,
+    #ff005b,
+    #ff7a00,
+    #ffee00,
+    #33ff00,
+    #00ffee,
+    #0078ff,
+    #cc00ff,
+    #ff005b
+  );
+  background-size: 1800% 1800%;
+  animation: rainbowFlow 50s ease infinite;
+  color: #222;
+}
+@keyframes rainbowFlow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+html[data-theme="rainbow"] main.card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(6px);
+  border-radius: 24px;
+  box-shadow: 0 8px 25px rgba(255, 100, 180, 0.4);
+  color: #222;
+}
+
+/* 🍑 Peach Theme */
+html[data-theme="peach"] body {
+  background: linear-gradient(135deg, #ffd1a3, #ffc7b8, #ffdfbf);
+  background-size: 400% 400%;
+  animation: peachWave 16s ease-in-out infinite alternate;
+  color: #3b2a1f;
+}
+@keyframes peachWave {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+html[data-theme="peach"] main.card {
+  background: rgba(255, 245, 235, 0.9);
+  border: 1px solid #ffb38a;
+  box-shadow: 0 8px 25px rgba(255, 180, 130, 0.4);
+}
+
+/* 💜 Lavender Dream Theme */
+html[data-theme="lavender"] body {
+  background: linear-gradient(135deg, #e9d8ff, #cbb5ff, #b7a4ff);
+  background-size: 300% 300%;
+  animation: lavenderFlow 14s ease-in-out infinite alternate;
+  color: #2a124f;
+}
+@keyframes lavenderFlow {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+html[data-theme="lavender"] main.card {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid #cfa8ff;
+  box-shadow: 0 0 20px rgba(180, 100, 255, 0.4);
+  color: #2a124f;
+}
+
+/* 🖤 Goth Clown Theme */
+html[data-theme="goth"] body {
+  background: radial-gradient(circle at 30% 30%, #000000, #12ff0e, #05000b,#12ff0e,#05000b,#12ff0e,#05000b,#12ff0e,#05000b);
+  background-size: 260% 260%;
+  animation: gothFlow 14s ease-in-out infinite alternate;
+  color: #fbf6ff;
+}
+@keyframes gothFlow {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+html[data-theme="goth"] main.card {
+  background: rgba(14, 3, 24, 0.9);
+  color: #fef7ff;
+  border: 1px solid rgba(255, 200, 255, 0.15);
+  box-shadow: 0 0 25px rgba(255, 0, 255, 0.3);
+}
+.bebby-wiggle {
+  animation: bebbyWiggle 0.6s ease-in-out;
+}
+@keyframes bebbyWiggle {
+  0% { transform: translateY(-3px) rotate(0deg); }
+  25% { transform: translateY(-4px) rotate(-4deg); }
+  50% { transform: translateY(-3px) rotate(4deg); }
+  75% { transform: translateY(-2px) rotate(-2deg); }
+  100% { transform: translateY(-3px) rotate(0deg); }
+}

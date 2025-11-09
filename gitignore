@@ -1,0 +1,6 @@
+# Environment & local data
+.env
+__pycache__/
+data/
+*.pyc
+instance/

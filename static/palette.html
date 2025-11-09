@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="strawberry">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎨 Palette Builder | Color Carnival</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="/static/app.js" defer></script>
+  <style>
+/* 🌈 Animated saturated rainbow background (50s loop) */
+/* 🌈 Animated saturated rainbow background (50s loop) */
+body {
+  font-family: "Poppins", system-ui, sans-serif;
+  background: linear-gradient(
+    270deg,
+    #ff005b,
+    #ff7a00,
+    #ffee00,
+    #33ff00,
+    #00ffee,
+    #0078ff,
+    #cc00ff,
+    #ff005b
+  );
+  background-size: 1600% 1600%;
+  animation: rainbowFlow 50s ease infinite;
+  overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
+  z-index: 0;
+}
+
+/* 🌀 Smooth rainbow shifting animation */
+@keyframes rainbowFlow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 🎡 White card overlay */
+main.card {
+  z-index: 2;
+  position: relative;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  padding: 20px;
+  margin: 40px auto;
+  width: 90%;
+  max-width: 800px;
+  box-shadow: 0 8px 30px rgba(255, 100, 150, 0.3);
+}
+
+/* ✨ Floating sparkles */
+#sparkles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.sparkle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.8);
+  width: 6px;
+  height: 6px;
+  animation: sparkleFloat 10s linear infinite;
+}
+@keyframes sparkleFloat {
+  from { transform: translateY(100vh) scale(0.8); opacity: 0; }
+  20%  { opacity: 1; }
+  to   { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+}
+
+/* 🖼 Palette image preview */
+#palettePreview {
+  display: none;
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  border-radius: 15px;
+  box-shadow: 0 0 15px rgba(255,150,200,.4);
+  cursor: crosshair;
+  transition: transform 0.2s ease;
+}
+#palettePreview:hover {
+  transform: scale(1.02);
+}
+#paletteCanvas { display: none; }
+
+/* 🎨 Color preview bubble */
+.color-preview {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid white;
+  margin: 10px auto;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* 💾 Saved colors */
+.saved-colors {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+.saved-color {
+  background: white;
+  border-radius: 15px;
+  padding: 8px;
+  text-align: center;
+  width: 160px;
+  box-shadow: 0 4px 10px rgba(255,100,150,.3);
+  font-size: 12px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.saved-color:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(255,140,180,.4);
+}
+.saved-color .swatch {
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  margin: 6px auto;
+  border: 2px solid #ffd1e3;
+}
+.saved-color button {
+  border: none;
+  padding: 4px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  cursor: pointer;
+  background: #ffe0eb;
+  color: #ff4d6d;
+  margin-top: 5px;
+}
+
+/* 🔔 Alert popup */
+#alertBox {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  border-radius: 10px;
+  display: none;
+  font-weight: 600;
+  z-index: 999;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+#alertBox.success { background: #ff69b4; }
+#alertBox.error { background: #ff4d6d; }
+</style>
+</head>
+<body>
+  <div id="sparkles"></div>
+  <div id="alertBox"></div>
+
+  <nav class="topnav">
+    <a href="/">🏠 Home</a>
+    <a href="/palette" class="active">🍭 Palette</a>
+    <a href="/grid">🍓 Grid</a>
+    <a href="/pressure">🧁 Pressure</a>
+    <a href="/tutorial">🌈 Tutorial</a>
+    <div class="topnav-right">
+      <select id="themeSelect">
+        <option value="strawberry">Strawberry</option>
+        <option value="lavender">Lavender</option>
+        <option value="peach">Peach</option>
+        <option value="goth">Goth Clown</option>
+      </select>
+    </div>
+  </nav>
+
+  <main class="card">
+    <h1>🎨 Palette Builder</h1>
+    <p>Upload your palette image, pick colors, name them, and save into palettes!</p>
+
+    <!-- Palette creation -->
+    <div class="input-row">
+      <input id="paletteNameInput" type="text" placeholder="Palette name (e.g. Prismacolor Set)" />
+      <button id="createPaletteBtn" class="primary">💾 Save / Select Palette</button>
+    </div>
+    <div class="input-row">
+      <select id="paletteSelect"></select>
+      <button id="deletePaletteBtn" class="danger">🗑️ Delete Palette</button>
+    </div>
+
+    <!-- Upload -->
+    <h3>1️⃣ Upload Palette Image</h3>
+    <input id="paletteFile" type="file" accept="image/*" />
+    <img id="palettePreview" alt="Palette preview (eyedropper enabled)" />
+    <canvas id="paletteCanvas"></canvas>
+
+    <!-- Color pick -->
+    <section id="pickedColorSection" style="display:none; margin-top:16px;">
+      <h3>2️⃣ Pick & Name Color</h3>
+      <div class="color-preview" id="colorPreview"></div>
+      <p><b>Hex:</b> <span id="colorHex">—</span> | <b>RGB:</b> <span id="colorRgb">—</span></p>
+      <input id="colorName" type="text" placeholder="Color name (e.g. Light Peach)" />
+      <div class="input-row" style="margin-top:10px;">
+        <select id="paletteDropdownForSave"></select>
+        <button id="lockColorBtn" class="primary">🔒 Lock / Unlock Eyedropper</button>
+        <button id="saveColorBtn" class="primary">✅ Save Color</button>
+      </div>
+    </section>
+
+    <h3 style="margin-top:20px;">3️⃣ Saved Colors</h3>
+    <div id="savedColors" class="saved-colors"></div>
+  </main>
+
+  <script>
+    // ✨ Sparkles
+    const sparkles=document.getElementById("sparkles");
+    for(let i=0;i<25;i++){
+      const s=document.createElement("div");
+      s.className="sparkle";
+      s.style.left=Math.random()*100+"vw";
+      s.style.animationDelay=Math.random()*10+"s";
+      sparkles.appendChild(s);
+    }
+
+    const preview=document.getElementById("palettePreview");
+    const canvas=document.getElementById("paletteCanvas");
+    const ctx=canvas.getContext("2d");
+    const colorPreview=document.getElementById("colorPreview");
+    const colorHex=document.getElementById("colorHex");
+    const colorRgb=document.getElementById("colorRgb");
+    const pickedSection=document.getElementById("pickedColorSection");
+    const colorName=document.getElementById("colorName");
+    const saveColorBtn=document.getElementById("saveColorBtn");
+    const lockColorBtn=document.getElementById("lockColorBtn");
+    const paletteFile=document.getElementById("paletteFile");
+    const savedColors=document.getElementById("savedColors");
+    const paletteSelect=document.getElementById("paletteSelect");
+    const paletteDropdownForSave=document.getElementById("paletteDropdownForSave");
+    const createPaletteBtn=document.getElementById("createPaletteBtn");
+    const deletePaletteBtn=document.getElementById("deletePaletteBtn");
+
+    let locked=false, currentHex=null, currentRgb=null;
+
+    function showAlert(msg,ok=true){
+      const a=document.getElementById("alertBox");
+      a.textContent=msg;
+      a.className=ok?"success":"error";
+      a.style.display="block";
+      setTimeout(()=>a.style.display="none",2500);
+    }
+
+    // 🧾 Load palettes
+    async function loadPalettes(selectLatest=false){
+      try {
+        const res=await fetch("/api/palettes");
+        const list=await res.json();
+        paletteSelect.innerHTML="";
+        paletteDropdownForSave.innerHTML="";
+        if(!list.length){
+          const opt=document.createElement("option");
+          opt.textContent="— No palettes yet —";
+          opt.value="";
+          paletteSelect.appendChild(opt);
+          paletteDropdownForSave.appendChild(opt.cloneNode(true));
+          return;
+        }
+        let last=null;
+        list.forEach(p=>{
+          const opt=document.createElement("option");
+          opt.value=p.id;
+          opt.textContent=p.name;
+          paletteSelect.appendChild(opt);
+          paletteDropdownForSave.appendChild(opt.cloneNode(true));
+          last=p.id;
+        });
+        if(selectLatest && last) paletteSelect.value=last;
+      } catch {
+        showAlert("Failed to load palettes 💔", false);
+      }
+    }
+    loadPalettes();
+
+    // 💾 Create palette
+    createPaletteBtn.addEventListener("click", async () => {
+  const name = document.getElementById("paletteNameInput").value.trim();
+  if (!name) {
+    showAlert("🎨 Please enter a palette name!", false);
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/palettes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+
+    const data = await res.json();
+    if (!res.ok || data.error) {
+      showAlert(data.error || "💔 Could not save palette", false);
+      return;
+    }
+
+    showAlert(`✨ Palette "${data.name}" saved!`, true);
+    document.getElementById("paletteNameInput").value = "";
+    await loadPalettes(true); // refresh list
+
+  } catch (err) {
+    console.error(err);
+    showAlert("🚨 Error connecting to server", false);
+  }
+});
+
+    // 🗑 Delete palette
+    deletePaletteBtn.addEventListener("click",async ()=>{
+      const id=parseInt(paletteSelect.value||"0",10);
+      if(!id)return showAlert("Select palette to delete",false);
+      if(!confirm("Delete this palette?"))return;
+      const res=await fetch(`/api/palettes/${id}`,{method:"DELETE"});
+      if(!res.ok)return showAlert("Delete failed",false);
+      showAlert("Palette deleted",true);
+      loadPalettes();
+    });
+
+    // 🖼 Upload image
+    paletteFile.addEventListener("change",e=>{
+      const f=e.target.files[0];
+      if(!f)return;
+      const url=URL.createObjectURL(f);
+      preview.src=url;
+      preview.style.display="block";
+      preview.onload=()=>{
+        canvas.width=preview.naturalWidth;
+        canvas.height=preview.naturalHeight;
+        ctx.drawImage(preview,0,0);
+      };
+    });
+
+    // 👁 Eyedropper
+    preview.addEventListener("mousemove",e=>{
+      // 👆 Lock eyedropper when clicking the image
+preview.addEventListener("click", ()=>{
+  if (!canvas.width) return;
+  locked = true;
+  showAlert("Eyedropper locked after picking color 🔒", true);
+});
+      if(!canvas.width||locked)return;
+      const r=preview.getBoundingClientRect();
+      const sx=canvas.width/r.width, sy=canvas.height/r.height;
+      const x=Math.floor((e.clientX-r.left)*sx);
+      const y=Math.floor((e.clientY-r.top)*sy);
+      const d=ctx.getImageData(x,y,1,1).data;
+      const [R,G,B]=d;
+      const hex=`#${[R,G,B].map(v=>v.toString(16).padStart(2,"0")).join("")}`;
+      colorPreview.style.background=hex;
+      colorHex.textContent=hex;
+      colorRgb.textContent=`rgb(${R},${G},${B})`;
+      pickedSection.style.display="block";
+      currentHex=hex;
+      currentRgb={r:R,g:G,b:B};
+    });
+
+    lockColorBtn.addEventListener("click",()=>{
+      locked=!locked;
+      showAlert(locked?"Eyedropper locked 🔒":"Eyedropper unlocked 🔓",true);
+    });
+
+    // ✅ Save color
+    saveColorBtn.addEventListener("click", async ()=>{
+      const name=colorName.value.trim();
+      const paletteId=parseInt(paletteDropdownForSave.value||"0",10);
+      if(!paletteId)return showAlert("Select palette to save color",false);
+      if(!currentHex)return showAlert("Pick a color first 🎨",false);
+      const res=await fetch(`/api/palettes/${paletteId}/colors`,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({name,hex:currentHex,rgb:currentRgb})
+      });
+      const data=await res.json();
+      if(!res.ok)return showAlert(data.error||"Save failed",false);
+      showAlert("Color saved!",true);
+      const div=document.createElement("div");
+      div.className="saved-color";
+      div.innerHTML=`
+        <div class="swatch" style="background:${currentHex};"></div>
+        <p><b>${name||"Unnamed"}</b></p>
+        <p>${currentHex}</p>
+        <p>rgb(${currentRgb.r},${currentRgb.g},${currentRgb.b})</p>
+        <p style="color:#ff7aa8;font-size:11px;">Palette: ${paletteDropdownForSave.options[paletteDropdownForSave.selectedIndex].text}</p>
+        <button>❌ Delete</button>`;
+      div.querySelector("button").addEventListener("click",()=>div.remove());
+      savedColors.appendChild(div);
+      colorName.value="";
+    });
+  </script>
+  <img id="strawbebby" src="/static/strawbebby.png" alt="Strawbebby" onclick="randomBebbyTip()">
+  <img id="strawbebby" src="/static/strawbebby.png" alt="Strawbebby" onclick="randomBebbyTip()">
+<script src="/static/strawbebby.js"></script>
+</body>
+</html>

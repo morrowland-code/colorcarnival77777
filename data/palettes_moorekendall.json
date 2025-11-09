@@ -1,0 +1,25 @@
+{
+  "palettes": [
+    {
+      "id": 1,
+      "name": "hujadg",
+      "colors": [
+        {
+          "id": 1,
+          "name": "doiwef",
+          "hex": "#a38677",
+          "rgb": {
+            "r": 163,
+            "g": 134,
+            "b": 119
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "gvthbyt",
+      "colors": []
+    }
+  ]
+}

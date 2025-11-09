@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="strawberry">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Color Carnival 🎪</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <div class="bg-bubbles">
+    <div></div><div></div><div></div><div></div><div></div>
+  </div>
+  <canvas id="confettiCanvas"></canvas>
+  <div id="alertBox"></div>
+
+  <nav class="topnav">
+    <a href="/" class="active">🏠 Home</a>
+    <a href="/palette">🍭 Palette</a>
+    <a href="/grid">🍓 Grid</a>
+    <a href="/pressure">🧁 Pressure</a>
+    <a href="/tutorial">🌈 Tutorial</a>
+    <div class="topnav-right">
+      <select id="themeSelect">
+        <option value="strawberry">Strawberry</option>
+        <option value="lavender">Lavender</option>
+        <option value="peach">Peach</option>
+        <option value="goth">Goth Clown</option>
+      </select>
+      <button id="loginStatusButton" class="btn-ghost">sign up or logout</button>
+    </div>
+    <!-- 🎠 Strawbebby Login/Register Popup -->
+<div id="authPopup" class="auth-popup">
+  <div class="auth-box">
+    <h2 id="authTitle">🎀 Sign In</h2>
+
+    <input id="authUsername" type="text" placeholder="Username" />
+    <input id="authPassword" type="password" placeholder="Password" />
+
+    <button id="authAction">Sign In</button>
+
+    <p class="auth-toggle">
+      <span id="toggleAuthMode">No account? Register here!</span>
+    </p>
+
+    <button id="authLogout" style="display:none;">Log Out</button>
+  </div>
+</div>
+
+<style>
+.auth-popup {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(3px);
+}
+
+.auth-box {
+  background: white;
+  border-radius: 24px;
+  padding: 30px 25px;
+  width: 320px;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  animation: popIn 0.35s ease;
+  transform: translateY(0);
+}
+
+@keyframes popIn {
+  from {
+    transform: translateY(-40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.auth-box h2 {
+  margin-bottom: 14px;
+  color: #ff4f9a;
+  font-family: "Poppins", sans-serif;
+}
+
+.auth-box input {
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: "Poppins", sans-serif;
+}
+
+.auth-box button {
+  width: 100%;
+  background: linear-gradient(135deg, #ff7bb0, #ffb6e1);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 0;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 10px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.auth-box button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(255, 120, 170, 0.4);
+}
+
+.auth-toggle {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #777;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif;
+}
+
+.auth-toggle:hover {
+  color: #ff4f98;
+}
+
+#authLogout {
+  background: #fff0f6;
+  color: #ff4f98;
+  border: 1px solid #ff9fca;
+}
+/* 🖋️ Make main page text black for readability */
+body, main, h1, h2, h3, p, a, label, span {
+  color: #000 !important;
+}
+
+/* Optional: make headings slightly bold and sharper */
+h1, h2, h3 {
+  color: #111 !important;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.3);
+}
+</style>
+  </nav>
+
+  <main class="card">
+    <div id="cc-wrap" style="width:100%;display:flex;justify-content:center;">
+  <svg viewBox="0 0 1800 450" style="max-width:100%;height:auto;">
+    <defs>
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
+        .cc-text {
+          font-family: 'Luckiest Guy', 'Baloo 2', 'Comic Sans MS', cursive, system-ui;
+          font-size: 200px;
+          letter-spacing: -10px;
+          -webkit-text-stroke: 18px #000;
+          text-stroke: 18px #000;
+          paint-order: stroke fill;
+          filter: drop-shadow(0 10px 0 rgba(0,0,0,.25));
+        }
+      </style>
+
+      <!-- Wider arc so all letters fit comfortably -->
+      <path id="cc-arc" d="M 100 350 C 600 50, 1200 50, 1700 350" />
+    </defs>
+
+    <text class="cc-text" stroke="#000" stroke-width="18" fill="#fff">
+      <textPath href="#cc-arc" startOffset="50%" text-anchor="middle">
+        <tspan dy="90" text-anchor="middle">
+          <!-- C O L O R -->
+          <tspan fill="#F44336">C</tspan>
+          <tspan fill="#FFB300">O</tspan>
+          <tspan fill="#4CAF50">L</tspan>
+          <tspan fill="#1E88E5">O</tspan>
+          <tspan fill="#FDD835">R</tspan>
+          <tspan dx="70"></tspan>
+          <!-- C A R N I V A L -->
+          <tspan fill="#E91E63">C</tspan>
+          <tspan fill="#9C27B0">A</tspan>
+          <tspan fill="#3F51B5">R</tspan>
+          <tspan fill="#03A9F4">N</tspan>
+          <tspan fill="#4CAF50">I</tspan>
+          <tspan fill="#FF9800">V</tspan>
+          <tspan fill="#FF5722">A</tspan>
+          <tspan fill="#795548">L</tspan>
+        </tspan>
+      </textPath>
+    </text>
+  </svg>
+</div>
+<!-- 🩷 Strawbebby Mascot Image -->
+<div style="width:100%;display:flex;justify-content:center;margin-top:-40px;">
+  <img 
+    src="https://43dc429c5576c497e641f19405b15142.cdn.bubble.io/f1761255759573x680838151976038700/ChatGPT%20Image%20Oct%2023%2C%202025%2C%2005_41_55%20PM.png" 
+    alt="Strawbebby mascot"
+    style="max-width:400px;width:80%;height:auto;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.3));"
+  >
+</div>
+    <h1>🎪 Welcome to <strong>Color Carnival</strong>🎪</h1>
+    <p>Photorealistic coloring guide with palette matching, grid overlays, and pressure hints.</p>
+
+      <div class="auth-panel">
+        <h3>Walkthrough 📘</h3>
+        <ol style="font-size:14px; padding-left:18px;">
+          <li>Upload your pencil color chart on the <b>Palette</b> page.</li>
+          <li>Click each swatch to pick its color, name it, and save it to a palette.</li>
+          <li>Upload your reference photo on the <b>Grid</b> page and overlay the grid.</li>
+          <li>Use the color matches to choose which pencils to use in each square.</li>
+          <li>Check <b>Pressure</b> to see how hard to press for perfect saturation.</li>
+        </ol>
+        <p style="margin-top:10px; font-size:13px;">
+          Premium unlock gives you top 5 mix percentages per square 🎟️
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <img id="strawbebby" src="/static/strawbebby.png" alt="Strawbebby" onclick="randomBebbyTip()">
+  <!-- 💫 Login/Register Popup -->
+<div id="authModal" class="auth-modal" style="display:none;">
+  <div class="auth-content">
+    <h2 id="authTitle">Sign In</h2>
+    <input id="authUsername" type="text" placeholder="Username">
+    <input id="authPassword" type="password" placeholder="Password">
+    <div class="auth-buttons">
+      <button id="authSubmit">Sign In</button>
+      <button id="toggleAuthMode" class="btn-ghost">Need an account?</button>
+    </div>
+  </div>
+</div>
+
+<style>
+/* 🩵 Auth Modal Styling */
+.auth-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+.auth-content {
+  background: #fff;
+  padding: 20px 24px;
+  border-radius: 18px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  text-align: center;
+  max-width: 320px;
+  width: 90%;
+  animation: popIn 0.3s ease;
+}
+@keyframes popIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+.auth-content input {
+  width: 100%;
+  margin: 8px 0;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+.auth-buttons {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.auth-content button {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #ff7bb0, #ffb6e1);
+  color: white;
+  font-weight: 600;
+}
+.auth-content .btn-ghost {
+  background: transparent;
+  color: #ff7bb0;
+}
+</style>
+<div id="authModal" class="auth-modal" style="display:none;">
+  <div class="auth-content">
+    <h2 id="authTitle">Sign In</h2>
+    <input id="authUsername" type="text" placeholder="Username">
+    <input id="authPassword" type="password" placeholder="Password">
+    <div class="auth-buttons">
+      <button id="authSubmit">Sign In</button>
+      <button id="toggleAuthMode" class="btn-ghost">Need an account?</button>
+    </div>
+  </div>
+</div>
+<footer style="
+  text-align:center;
+  font-size:13px;
+  color:#555;
+  padding:20px 10px;
+  margin-top:40px;
+  background:rgba(255,255,255,0.8);
+  border-top:1px solid rgba(0,0,0,0.08);
+  border-radius:20px 20px 0 0;
+  box-shadow:0 -4px 12px rgba(255,100,150,0.15);
+">
+  <p>
+    💖 <b>Color Carnival</b> © 2025 — All rights reserved.<br>
+    <a href="/privacy" style="color:#ff5fa5;text-decoration:none;">Privacy Policy</a>
+    ·
+    <a href="/terms" style="color:#ff5fa5;text-decoration:none;">Terms of Service</a>
+  </p>
+</footer>
+<img id="strawbebby" src="/static/strawbebby.png" alt="Strawbebby" onclick="randomBebbyTip()">
+<img id="strawbebby" src="/static/strawbebby.png" alt="Strawbebby" onclick="randomBebbyTip()">
+<script src="/static/strawbebby.js"></script>
+</body>
+</html>

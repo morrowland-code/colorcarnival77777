@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="strawberry">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧩 Grid Overlay | Color Carnival</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js" defer></script>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(270deg, #ff8aa1, #ffd98a, #8affc1, #8ae0ff, #b78aff, #f98aff, #ff8aa1);
+      background-size: 1200% 1200%;
+      animation: rainbowFlow 50s ease infinite;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+    @keyframes rainbowFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    canvas#gridCanvas {
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(255,150,200,.4);
+      margin-top: 16px;
+      max-width: 100%;
+    }
+    #alertBox {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      border-radius: 10px;
+      display: none;
+      font-weight: 600;
+      z-index: 999;
+      color: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    #alertBox.success { background: #ff69b4; }
+    #alertBox.error { background: #ff4d6d; }
+    .grid-results {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 400px;
+      overflow-y: auto;
+      padding: 10px;
+      background: rgba(255,255,255,0.8);
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(255,100,150,0.25);
+    }
+    .result-card {
+      background: white;
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      box-shadow: 0 4px 8px rgba(255,100,150,0.2);
+      transition: transform 0.2s ease;
+    }
+    .result-card:hover { transform: scale(1.02); }
+    .cell-swatch {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      border: 2px solid #ffd1e3;
+      flex-shrink: 0;
+    }
+    .match-group, .mix-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .match-chip {
+      background: #ffe0eb;
+      border-radius: 10px;
+      padding: 4px 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .match-swatch {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      border: 1px solid #fff;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div id="alertBox"></div>
+  <nav class="topnav">
+    <a href="/">🏠 Home</a>
+    <a href="/palette">🍭 Palette</a>
+    <a href="/grid" class="active">🍓 Grid</a>
+    <a href="/pressure">🧁 Pressure</a>
+    <a href="/tutorial">🌈 Tutorial</a>
+    <div class="topnav-right">
+      <select id="themeSelect">
+        <option value="strawberry">Strawberry</option>
+        <option value="lavender">Lavender</option>
+        <option value="peach">Peach</option>
+        <option value="goth">Goth Clown</option>
+      </select>
+    </div>
+  </nav>
+
+  <main class="card">
+    <h1>🧩 Grid Overlay</h1>
+    <p>Upload your reference image, draw a grid on top, and generate color matches.</p>
+
+    <h3>1️⃣ Upload your reference image</h3>
+    <input type="file" id="gridFile" accept="image/*">
+
+    <div class="input-row" style="margin-top:8px;">
+      <div>
+        <label>Grid cell size (px)</label>
+        <input type="number" id="gridSize" value="20" min="5" max="200">
+      </div>
+      <div style="display:flex;flex-direction:column;justify-content:flex-end;gap:6px;">
+        <button id="drawGrid">Draw Grid Overlay</button>
+        <button id="printGrid" style="display:none;">🖨️ Print Grid</button>
+      </div>
+    </div>
+
+    <canvas id="gridCanvas"></canvas>
+    <hr style="margin:20px 0;">
+
+    <h3>2️⃣ Analyze & Match Colors</h3>
+    <p style="font-size:13px;">
+      This preview shows top 5 closest pencils for each grid cell.<br>
+      Also see mix color suggestions.
+    </p>
+
+    <div class="input-row">
+      <div>
+        <label>Palette for matching</label>
+        <select id="paletteForMatch"></select>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <button id="matchWithPalette">Match colors (preview)</button>
+    </div>
+
+    <!-- 🌀 Loading spinner -->
+    <div id="loadingSpinner" style="display:none; text-align:center; margin-top:20px;">
+      <div style="width:50px;height:50px;border:6px solid rgba(255,255,255,0.4);border-top-color:#ff69b4;border-radius:50%;margin:0 auto 10px;animation: spin 1s linear infinite;"></div>
+      <p style="font-size:13px;color:#ff69b4;">Loading squares...</p>
+    </div>
+
+    <!-- 🎨 Progress bar -->
+    <div id="progressWrap" style="display:none;margin-top:20px;">
+      <p style="font-size:13px;color:#ff69b4;margin-bottom:6px;">
+        Processing colors... <span id="progressPercent">0%</span>
+      </p>
+      <div style="width:100%;height:14px;border-radius:999px;background:rgba(0,0,0,0.1);overflow:hidden;">
+        <div id="progressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#ff7bb0,#ffb6e1);border-radius:inherit;transition:width 0.2s ease;"></div>
+      </div>
+    </div>
+
+    <div class="grid-results" id="gridResultsList"></div>
+  </main>
+
+  <img id="strawbebby" src="/static/strawbebby.png" alt="Strawbebby" onclick="randomBebbyTip()">
+
+  <script>
+    const gridFile = document.getElementById("gridFile");
+    const gridCanvas = document.getElementById("gridCanvas");
+    const ctx = gridCanvas.getContext("2d");
+    const drawBtn = document.getElementById("drawGrid");
+    const gridSizeInput = document.getElementById("gridSize");
+    const printBtn = document.getElementById("printGrid");
+    const paletteDropdown = document.getElementById("paletteForMatch");
+    const gridResultsList = document.getElementById("gridResultsList");
+
+    let originalImageDataURL = null;
+
+    // 🎨 Load palettes
+    async function loadPaletteDropdown() {
+      try {
+        const res = await fetch("/api/palettes");
+        const list = await res.json();
+        paletteDropdown.innerHTML = "";
+        if (!list.length) {
+          const opt = document.createElement("option");
+          opt.textContent = "— No palettes saved —";
+          opt.value = "";
+          paletteDropdown.appendChild(opt);
+          return;
+        }
+        list.forEach((p) => {
+          const opt = document.createElement("option");
+          opt.value = p.id;
+          opt.textContent = p.name;
+          paletteDropdown.appendChild(opt);
+        });
+      } catch {
+        showAlert("Failed to load palettes 💔", false);
+      }
+    }
+    loadPaletteDropdown();
+
+    // 🧩 Draw grid
+    drawBtn.addEventListener("click", () => {
+      const file = gridFile.files[0];
+      if (!file) return showAlert("Please upload an image first", false);
+      const size = parseInt(gridSizeInput.value || "20", 10);
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        originalImageDataURL = reader.result;
+        img.onload = () => {
+          gridCanvas.width = img.width;
+          gridCanvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+          drawGridOverlay(size);
+          printBtn.style.display = "inline-block";
+          showAlert("Grid overlay ready!", true);
+          confettiBurst();
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function drawGridOverlay(size) {
+      ctx.strokeStyle = "rgba(255, 105, 180, 0.8)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x < gridCanvas.width; x += size) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, gridCanvas.height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < gridCanvas.height; y += size) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(gridCanvas.width, y);
+        ctx.stroke();
+      }
+    }
+
+    printBtn.addEventListener("click", () => {
+      const w = window.open("");
+      w.document.write(`<img src="${gridCanvas.toDataURL()}" style="width:100%">`);
+      w.print();
+      w.close();
+    });
+
+    // 💎 Match colors — progressive render with spinner + bar
+    document.getElementById("matchWithPalette").addEventListener("click", async () => {
+      const paletteId = parseInt(paletteDropdown.value || "0", 10);
+      if (!paletteId) return showAlert("Select a palette first 🎨", false);
+      if (!originalImageDataURL) return showAlert("Upload and draw your grid first 🧩", false);
+
+      const gridSize = parseInt(gridSizeInput.value || "20", 10);
+      const progressWrap = document.getElementById("progressWrap");
+      const progressBar = document.getElementById("progressBar");
+      const progressPercent = document.getElementById("progressPercent");
+      const spinner = document.getElementById("loadingSpinner");
+
+      try {
+        const palRes = await fetch("/api/palettes");
+        const palData = await palRes.json();
+        const chosenPal = palData.find((p) => p.id === paletteId);
+        if (!chosenPal || !chosenPal.colors?.length)
+          return showAlert("No colors in selected palette", false);
+
+        spinner.style.display = "block";
+        progressWrap.style.display = "none";
+        showAlert("Extracting and matching colors...", true);
+        gridResultsList.innerHTML = "";
+
+        const res = await fetch("/api/grid/extract_match_mix", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            image: originalImageDataURL,
+            grid_size: gridSize,
+            palette: chosenPal.colors,
+            premium: true
+          }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Error matching colors");
+
+        let index = 0;
+        const total = data.matched.length;
+
+        function renderNext() {
+          if (index >= total) {
+            spinner.style.display = "none";
+            progressBar.style.width = "100%";
+            progressPercent.textContent = "100%";
+            showAlert("Done! 🎉 All squares processed.", true);
+            return;
+          }
+
+          if (index === 0) {
+            spinner.style.display = "none";
+            progressWrap.style.display = "block";
+          }
+
+          const cell = data.matched[index];
+          const card = document.createElement("div");
+          card.className = "result-card";
+          card.innerHTML = `
+            <div class="cell-swatch" style="background:${cell.cell};"></div>
+            <div>
+              <p><b>Square ${index + 1}</b> (${cell.cell})</p>
+              <p style="font-size:11px;color:#ff7aa8;">Palette: ${chosenPal.name}</p>
+              <div class="match-group"></div>
+              ${cell.mix_colors ? `<div class="mix-group"><b>🎨 Mix Colors:</b></div>` : ""}
+            </div>`;
+
+          const matchGroup = card.querySelector(".match-group");
+          cell.matches.forEach(m => {
+            const chip = document.createElement("div");
+            chip.className = "match-chip";
+            chip.innerHTML = `
+              <div class="match-swatch" style="background:${m.hex};"></div>
+              <span>${m.name || "Unnamed"}<br><small>${m.hex}</small></span>`;
+            matchGroup.appendChild(chip);
+          });
+
+          if (cell.mix_colors) {
+            const mixGroup = card.querySelector(".mix-group");
+            cell.mix_colors.forEach(m => {
+              const chip = document.createElement("div");
+              chip.className = "match-chip";
+              chip.innerHTML = `
+                <div class="match-swatch" style="background:${m.hex};"></div>
+                <span>${m.mix_with} (${m.ratio}%)</span>`;
+              mixGroup.appendChild(chip);
+            });
+          }
+
+          gridResultsList.appendChild(card);
+
+          index++;
+          const percent = Math.floor((index / total) * 100);
+          progressPercent.textContent = `${percent}%`;
+          progressBar.style.width = `${percent}%`;
+
+          requestAnimationFrame(renderNext);
+        }
+
+        requestAnimationFrame(renderNext);
+      } catch (err) {
+        showAlert("Error: " + err.message, false);
+      }
+    });
+  </script>
+  <img id="strawbebby" src="/static/strawbebby.png" alt="Strawbebby" onclick="randomBebbyTip()">
+  <img id="strawbebby" src="/static/strawbebby.png" alt="Strawbebby" onclick="randomBebbyTip()">
+<script src="/static/strawbebby.js"></script>
+</body>
+</html>

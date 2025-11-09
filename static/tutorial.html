@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="strawberry">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📘 Tutorial | Color Carnival</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <div class="bg-bubbles"><div></div><div></div><div></div><div></div><div></div></div>
+  <canvas id="confettiCanvas"></canvas>
+  <div id="alertBox"></div>
+
+  <nav class="topnav">
+    <a href="/">🏠 Home</a>
+    <a href="/palette">🍭 Palette</a>
+    <a href="/grid">🍓 Grid</a>
+    <a href="/pressure">🧁 Pressure</a>
+    <a href="/tutorial" class="active">🌈 Tutorial</a>
+    <div class="topnav-right">
+      <select id="themeSelect">
+        <option value="strawberry">Strawberry</option>
+        <option value="lavender">Lavender</option>
+        <option value="peach">Peach</option>
+        <option value="goth">Goth Clown</option>
+      </select>
+    </div>
+  </nav>
+
+  <main class="card">
+    <h1>📘 How to use Color Carnival</h1>
+    <p>Strawbebby will guide you through photorealistic coloring step by step.</p>
+
+    <h3>Step 1: Build your palette</h3>
+    <ul>
+      <li>Go to the <b>Palette</b> page.</li>
+      <li>Upload a photo of your pencil color chart.</li>
+      <li>Click each swatch, name it, and save it into a palette.</li>
+      <li>You can create multiple palettes (for different brands/sets).</li>
+    </ul>
+
+    <h3>Step 2: Prepare your drawing</h3>
+    <ul>
+      <li>Print your reference image at the size you want to draw.</li>
+      <li>Print a blank white page grid from the <b>Grid</b> page on a transparent or thin paper.</li>
+      <li>Tape the grid lightly on top of your drawing paper and use a lightbox or window.</li>
+      <li>Make sure everything is aligned and taped so it doesn’t move.</li>
+    </ul>
+
+    <h3>Step 3: Use the grid overlay & matches</h3>
+    <ul>
+      <li>Upload the same reference image on the <b>Grid</b> page.</li>
+      <li>Choose a grid size that roughly matches your printed grid.</li>
+      <li>Draw the grid overlay digitally and optionally save grid data to the backend.</li>
+      <li>Select a palette and hit <b>Match colors</b> to preview top 5 pencil choices per square.</li>
+      <li>Premium unlock lets you see mix percentages for the top 5 colors.</li>
+      <li>Starting at the top left corner square and moving to the right along the x-axis is the order of the matches.</li>
+    </ul>
+
+    <h3>Step 4: Adjust pressure</h3>
+    <ul>
+      <li>Use the <b>Pressure</b> page to compare ideal hex vs actual pencil result.</li>
+      <li>The bar shows how hard to press (0% = super light, 100% = very firm).</li>
+      <li>Always build up slowly; realism comes from layered saturation, not just one heavy pass.</li>
+    </ul>
+
+    <p style="margin-top:16px;font-size:13px;">
+  </main>
+
+  <img id="strawbebby" src="/static/strawbebby.png" alt="Strawbebby" onclick="randomBebbyTip()">
+  <img id="strawbebby" src="/static/strawbebby.png" alt="Strawbebby" onclick="randomBebbyTip()">
+<script src="/static/strawbebby.js"></script>
+</body>
+</html>

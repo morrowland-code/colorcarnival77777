@@ -1,0 +1,20 @@
+{
+  "palettes": [
+    {
+      "id": 2,
+      "name": "gcg",
+      "colors": [
+        {
+          "id": 1,
+          "name": "hjvhjhv",
+          "hex": "#ecd1c1",
+          "rgb": {
+            "r": 236,
+            "g": 209,
+            "b": 193
+          }
+        }
+      ]
+    }
+  ]
+}
